@@ -1,0 +1,54 @@
+name:                  monocypher
+version:               0.1.0.0
+synopsis:              Pending.
+homepage:              https://github.com/brendanhay/monocypher
+bug-reports:           https://github.com/brendanhay/monocypher/issues
+license:               MPL-2.0
+license-file:          LICENSE
+author:                Brendan Hay
+maintainer:            Brendan Hay <brendan.g.hay@gmail.com>
+copyright:             Copyright (c) 2017 Brendan Hay
+category:              Cryptography
+build-type:            Simple
+extra-source-files:    README.md
+cabal-version:         >= 1.10
+
+description:
+    Pending
+
+source-repository head
+    type:     git
+    location: git://github.com/brendanhay/monocypher.git
+
+library
+    default-language: Haskell2010
+    hs-source-dirs:   src
+
+    ghc-options:      -Wall -Wincomplete-uni-patterns
+
+    exposed-modules:
+          Monocypher
+          Monocypher.Context
+          Monocypher.Types
+
+    other-modules:
+
+    build-depends:
+          base     >= 4.7 && < 5
+        , inline-c == 0.5.6.*
+
+        , bytestring
+        , containers
+        , vector
+
+    cc-options:       -Wall -O2
+
+    include-dirs:
+          cbits
+
+    includes:
+          cbits/monocypher.h
+
+    c-sources:
+          cbits/monocypher.c
+
