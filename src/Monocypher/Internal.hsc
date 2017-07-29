@@ -3,17 +3,31 @@
 {-# LANGUAGE RecordWildCards   #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Monocypher.Types where
+module Monocypher.Internal where
 
 import Data.ByteString (ByteString)
-import Data.Vector.Storable (Vector)
-import Data.Word            (Word8)
+import Data.Monoid     ((<>))
 
 import Foreign.C.Types
 import Foreign.Ptr      (Ptr)
-import Foreign.Storable (Storable(..))
+import Foreign.Storable (Storable (alignment, sizeOf, poke, pokeByteOff, peek, peekByteOff))
+
+import qualified Data.Map                  as Map
+import qualified Language.C.Inline         as C
+import qualified Language.C.Inline.Context as C
+import qualified Language.C.Types          as C
 
 #include "monocypher.h"
+
+context :: C.Context
+context = mempty { C.ctxTypesTable = types } <> C.bsCtx <> C.baseCtx
+
+types :: C.TypesTable
+types = Map.fromList
+    [ (C.TypeName "crypto_chacha_ctx",   [t| Chacha20 |])
+    , (C.TypeName "crypto_poly1305_ctx", [t| Poly1305 |])
+    , (C.TypeName "crypto_blake2b_ctx",  [t| Blake2b  |])
+    ]
 
 newtype MAC   = MAC   ByteString
 newtype Key   = Key   ByteString

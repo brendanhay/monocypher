@@ -11,10 +11,10 @@ module Monocypher
       cryptoLock
     , cryptoUnlock
 
-    -- * Types
-    , Chacha20
-    , Poly1305
-    , Blake2b
+    -- -- * Types
+    -- , Chacha20
+    -- , Poly1305
+    -- , Blake2b
 
     , Key
     , Nonce
@@ -24,27 +24,22 @@ module Monocypher
     , MAC
     ) where
 
-import Data.ByteString              (ByteString)
-import Data.Vector.Storable         (Vector)
-import Data.Vector.Storable.Mutable (MVector)
-import Data.Word                    (Word8)
+import Data.Word (Word8)
 
-import Monocypher.Types
+import Monocypher.Internal (Ciphertext (..), Key (..), MAC (..), Nonce (..),
+                            Plaintext (..))
 
 import Foreign.Marshal.Array (allocaArray)
 import Foreign.Ptr           (Ptr, castPtr)
 
-import qualified Data.ByteString              as BS
-import qualified Data.ByteString.Unsafe       as BS
-import qualified Data.Vector.Generic          as Generic
-import qualified Data.Vector.Storable         as Vector
-import qualified Data.Vector.Storable.Mutable as Mutable
-import qualified Language.C.Inline            as C
-import qualified Monocypher.Context           as Cypher
+import qualified Data.ByteString        as BS
+import qualified Data.ByteString.Unsafe as BS
+import qualified Language.C.Inline      as C
+import qualified Monocypher.Internal    as Cypher
 
 -- FIXME: Recreate the Monocypher test suite
 
-C.context Cypher.openContext
+C.context Cypher.context
 
 C.include "monocypher.h"
 

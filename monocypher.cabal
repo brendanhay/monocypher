@@ -28,8 +28,7 @@ library
 
     exposed-modules:
           Monocypher
-          Monocypher.Context
-          Monocypher.Types
+          Monocypher.Internal
 
     other-modules:
 
@@ -39,7 +38,6 @@ library
 
         , bytestring
         , containers
-        , vector
 
     cc-options:       -Wall -O2
 
@@ -52,3 +50,42 @@ library
     c-sources:
           cbits/monocypher.c
 
+test-suite doctest
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    main-is:          DocTest.hs
+    hs-source-dirs:   test
+
+    ghc-options:      -Wall -Wincomplete-uni-patterns
+
+    build-depends:
+          base
+        , doctest
+        , doctest-discover
+
+test-suite spec
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    main-is:          Spec.hs
+    hs-source-dirs:   test
+
+    ghc-options:      -Wall -Wincomplete-uni-patterns
+
+    other-modules:
+        MonocypherSpec
+
+    build-depends:
+          base
+        , hspec
+
+benchmark bench
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    main-is:          Bench.hs
+    hs-source-dirs:   bench
+
+    ghc-options:      -Wall -Wincomplete-uni-patterns
+
+    build-depends:
+          base
+        , criterion
