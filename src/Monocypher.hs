@@ -65,12 +65,15 @@ module Monocypher
 
 import Data.Bifunctor  (second)
 import Data.ByteString (ByteString)
+import Data.Function   (on)
 import Data.Word       (Word32, Word8)
-
-import Monocypher.Internal
 
 import Foreign.C.Types (CChar)
 import Foreign.Ptr     (Ptr)
+
+import Monocypher.Internal
+
+import System.IO.Unsafe (unsafePerformIO)
 
 import qualified Data.ByteString        as BS
 import qualified Data.ByteString.Unsafe as BS
@@ -767,15 +770,23 @@ precisely, their timing depends solely on the _length_ of their
 inputs.)
 -}
 
-class ConstantTimeEq m a where
-    constantTimeEq :: a -> a -> m Bool
+class ConstantTimeEq a where
+    constantTimeEq :: a -> a -> Bool
 
-instance ConstantTimeEq IO MAC where
+instance ConstantTimeEq MAC where
     constantTimeEq (MAC a) (MAC b)= cryptoCompare a b
-    {-# INLINE constantTimeEq #-}
 
-cryptoCompare :: ByteString -> ByteString -> IO Bool
-cryptoCompare a b = do
+instance ConstantTimeEq PublicKey where
+    constantTimeEq a b = on cryptoCompare unsafePublicKey a b
+
+instance ConstantTimeEq SharedKey where
+    constantTimeEq a b = on cryptoCompare unsafeSharedKey a b
+
+instance ConstantTimeEq SecretKey where
+    constantTimeEq a b = on cryptoCompare unsafeSecretKey a b
+
+cryptoCompare :: ByteString -> ByteString -> Bool
+cryptoCompare a b = unsafePerformIO $ do
     -- int crypto_memcmp (const uint8_t *p1, const uint8_t *p2, size_t n);
 
     code <- [C.block|int {
@@ -784,8 +795,8 @@ cryptoCompare a b = do
 
     pure $! code == 0
 
-cryptoIsZeros :: ByteString -> IO Bool
-cryptoIsZeros a = do
+cryptoIsZeros :: ByteString -> Bool
+cryptoIsZeros a = unsafePerformIO $ do
     -- int crypto_zerocmp(const uint8_t *p , size_t n);
 
     code <- [C.block|int {
